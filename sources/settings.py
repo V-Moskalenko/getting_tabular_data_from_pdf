@@ -1,4 +1,5 @@
 import logging
+import os.path
 import sys
 from logging.handlers import TimedRotatingFileHandler
 from pathlib import Path
@@ -8,18 +9,18 @@ from pydantic import BaseModel
 
 from utils.pydantic_settings_data_class import Configuration
 
-LOGS_PATH = 'logs'
+LOGS_PATH = Path.cwd().parent / Path("logs")
 LOGGER_NAME = 'getting_tabular_data_from_pdf'
 logger = logging.getLogger(LOGGER_NAME)
 
 
 class PathProject(BaseModel):
     fine_reader_path: str = r'C:\Program Files (x86)\ABBYY FineReader 15\FineReader.exe'
-    temp_dir: str = r'builds\temp'
+    temp_dir: str = os.path.abspath(r'builds\temp')
 
 
 class LoggerConfig(BaseModel):
-    folder: str = LOGS_PATH
+    folder: Path = LOGS_PATH
     level: int = logging.INFO
     environment: str = 'DEV'
 
@@ -33,7 +34,7 @@ class TelebotConfig(BaseModel):
 
 
 class PopplerConfig(BaseModel):
-    poppler_path: str = r'utils\poppler-23.01.0\Library\bin'
+    poppler_path: str = r'utils/poppler-23.01.0/Library/bin'
 
 
 class ProjectConfig(Configuration):
@@ -43,8 +44,9 @@ class ProjectConfig(Configuration):
     telebot_config: TelebotConfig = TelebotConfig()
     poppler_config: PopplerConfig = PopplerConfig()
 
+
 def setup_logger():
-    log_folder = Path(config_class.logger.folder)
+    log_folder = config_class.logger.folder
     formatter = logging.Formatter('%(asctime)-15s\t%(levelname)s\t%(module)s: %(message)s')
     root = logging.getLogger()
 
@@ -53,7 +55,7 @@ def setup_logger():
     console_handler.setFormatter(formatter)
 
     rotating_handler = TimedRotatingFileHandler(
-        filename=log_folder.joinpath(f'{LOGGER_NAME}.log'),
+        filename=Path(log_folder) / Path(f'{LOGGER_NAME}.log'),
         encoding='utf-8',
         when='W6',
         interval=1,
@@ -69,5 +71,5 @@ def setup_logger():
 
 config_class = ProjectConfig()
 setup_logger()
-with open(r'config/configuration.toml', 'w') as file:
-    toml.dump(config_class.model_dump(), file)
+# with open(r'../config/configuration.toml', 'w') as file:
+#     toml.dump(config_class.model_dump(), file)

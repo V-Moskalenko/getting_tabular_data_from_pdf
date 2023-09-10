@@ -1,6 +1,9 @@
 import logging
+from pathlib import Path
+
 from tendo import singleton
-from telegram_bot import telebot_module
+
+from sources.telegram_bot import telebot_module
 
 logger = logging.getLogger(__name__)
 

@@ -8,10 +8,10 @@ import numpy as np
 from pdf2image import convert_from_path
 from PIL import Image
 
-from settings import config_class
+from sources.settings import config_class
 
 pytesseract.pytesseract.tesseract_cmd = config_class.tesseract.tesseract_path
-POPPLER_PATH = config_class.poppler_config.poppler_path
+
 
 logger = logging.getLogger(__name__)
 
@@ -54,11 +54,13 @@ class RecognitionModule:
 
         :return: Список путей до полученных рисунков
         """
+        poppler_path = config_class.poppler_config.poppler_path
+        temp_dir = config_class.path_project.temp_dir
         try:
-            pages = convert_from_path(self.path_to_pdf, 600, poppler_path=POPPLER_PATH)
+            pages = convert_from_path(self.path_to_pdf, 600, poppler_path=poppler_path)
             pdf_name = os.path.basename(self.path_to_pdf).split('.')[0]
             pdf_name = self.rename_pdf_file(pdf_name)
-            save_image = lambda page, count: (path := fr'builds\temp\{pdf_name}_page_{count}.png', page.save(path, 'PNG'))
+            save_image = lambda page, count: (path := fr'{temp_dir}\{pdf_name}_page_{count}.png', page.save(path, 'PNG'))
             image_list = [save_image(page, count)[0] for page, count in zip(pages, range(1, len(pages) + 1))]
             return image_list
         except Exception as e:

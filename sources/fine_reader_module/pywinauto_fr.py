@@ -1,10 +1,18 @@
-from pathlib import Path
 from pywinauto.application import Application
 
-from settings import config_class
+from sources.settings import config_class
 
 
 def recognition_using_fine_reader(path_to_the_recognition_file: str, path_to_save: str):
+    """
+    Функция запуска UI работы с ABBYY FineReader
+    Открывает десктопное приложение, по пути указанной в файле конфигурации проекта.
+    Выбирает конвертацию в excel формат и сохраняет файл по указанному пути.
+
+    :param path_to_the_recognition_file: Путь до PDF-файла, который необходимо ковертировать
+    :param path_to_save: Путь, конечного файла в формате xlsx
+    :return: None
+    """
     app = Application().start(config_class.path_project.fine_reader_path)
     # Инициализируем главное окно программы FineReader
     fr_app = app.window(title_re='ABBYY FineReader PDF 15')

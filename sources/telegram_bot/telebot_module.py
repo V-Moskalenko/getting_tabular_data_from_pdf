@@ -1,11 +1,9 @@
-from pathlib import Path
-
 import telebot
 import logging
 from telebot import types
 
-from recognition_module.pandas_work_with_file import recognition_main, delete_temp_files
-from settings import config_class
+from sources.recognition_module.pandas_work_with_file import recognition_main, delete_temp_files
+from sources.settings import config_class
 
 logger = logging.getLogger(__name__)
 
@@ -29,12 +27,18 @@ TEXT_R2 = "Перевёрнуто"
 TEXT_R3 = "Повернуто на 90 градусов вправо"
 TEXT_R4 = "Изображение не наклонено"
 
-
 bot = telebot.TeleBot(config_class.telebot_config.token)
 
 
 @bot.message_handler(commands=['start'])
 def start(message):
+    """
+    Стартовое сообщение, с приветствием пользователя
+    Начало цепочки событий: Шаг №1
+
+    :param message: Сообщение
+    :return: None
+    """
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     btn1 = types.KeyboardButton(TEXT_START)
     btn2 = types.KeyboardButton('/start')
@@ -47,13 +51,20 @@ def start(message):
 
 @bot.message_handler(content_types=['text'])
 def func(message):
+    """
+    Шаг №2 - проверка на нажатие кнопки и отутствие текста от пользователя в чат
+
+    :param message: Сообщение
+    :return: None
+    """
     try:
         if message.text == TEXT_START:
             rotation_button(message)
         elif message.text.lower().strip() == 'привет':
             bot.send_message(message.chat.id, 'Отлично выглядишь! А теперь выберем кнопку задания')
         else:
-            bot.send_message(message.chat.id, 'Пожалуйста не пишите ничего в чат и следуйте инструкции. Запускаюсь заново')
+            bot.send_message(message.chat.id,
+                             'Пожалуйста не пишите ничего в чат и следуйте инструкции. Запускаюсь заново')
             logger.info(f"{message.from_user.username} прислал текст - {message.text}")
             start(message)
     except Exception as e:
@@ -64,6 +75,12 @@ def func(message):
 
 @bot.message_handler(commands=['button'])
 def rotation_button(message):
+    """
+    Шаг №3 - Получение от пользователя наклона изображения
+
+    :param message: Сообщение
+    :return: None
+    """
     if message.text == TEXT_START:
         try:
             markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
@@ -83,6 +100,12 @@ def rotation_button(message):
 
 @bot.message_handler(content_types=['text'])
 def get_rotation(message):
+    """
+    Шаг №4 - Получение от пользователя PDF-файла
+
+    :param message: Сообщение
+    :return: None
+    """
     try:
         rotation = {
             TEXT_R1: 270,
@@ -102,19 +125,37 @@ def get_rotation(message):
 
 @bot.message_handler(content_types=['document'])
 def pdf_to_excel(message, degree_of_rotation):
+    """
+    Распознавание полученного файла и возврат результата пользователю
+
+    :param message: Сообщение
+    :param degree_of_rotation: Наклон изображения от пользователя
+    :return: None
+    """
     try:
         file_info = bot.get_file(message.document.file_id)
         logger.info(f'{message.from_user.username} - отправил следующий файл: {message.document.file_name}')
+        # Скачиваем направленный файл
         downloaded_file = bot.download_file(file_info.file_path)
-        downloaded_file_path = config_class.path_project.temp_dir + f'\{message.document.file_name}'
+        downloaded_file_path = config_class.path_project.temp_dir + fr'\{message.document.file_name}'
+        # Проверяем что файл PDF-формата
+        if '.pdf' not in message.document.file_name:
+            bot.send_message(message.chat.id,
+                             'Направленный файл не имеет расширения ".pdf", пожалуйста проверьте корректность файла')
+            start(message)
+            return
         with open(downloaded_file_path, 'wb') as new_file:
             new_file.write(downloaded_file)
-        bot.send_message(message.chat.id, f"Приступил к обработке {message.document.file_name}, подождите пожалуйста несколько минут")
+        bot.send_message(message.chat.id,
+                         f"Приступил к обработке {message.document.file_name}, подождите пожалуйста несколько минут")
+        # Начинаем распознавание файла
         recognized_file = recognition_main(downloaded_file_path, degree_of_rotation)
+        # Направляем результат пользователю
         with open(recognized_file, 'rb') as excel:
             bot.send_document(message.chat.id, excel)
         bot.send_message(message.chat.id, 'PDF обработан, данные в excel файле. Прекрасного дня!')
         logger.info(f'Отправил пользователю {message.from_user.username} файл: {recognized_file}')
+        # Удаляем временные файлы
         delete_temp_files(downloaded_file_path, recognized_file)
         start(message)
     except Exception as e:
