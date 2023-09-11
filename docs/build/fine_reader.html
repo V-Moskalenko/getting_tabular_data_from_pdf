@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+
+<html lang="ru" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Модуль работы с FineReader &#8212; документация Получение табличных данных из PDF 1.0.0</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=e35015f7"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=29b1f277"></script>
+    <link rel="index" title="Алфавитный указатель" href="genindex.html" />
+    <link rel="search" title="Поиск" href="search.html" />
+    <link rel="prev" title="Welcome to Получение табличных данных из PDF’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="finereader">
+<h1>Модуль работы с FineReader<a class="headerlink" href="#finereader" title="Link to this heading">¶</a></h1>
+<section id="id1">
+<h2>Расположение<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>sources -&gt; fine_reader_module -&gt; pywinauto_fr.py</p>
+</section>
+<section id="id2">
+<h2>Описание<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>Модуль работы с десктопным приложением ABBYY FineReader.
+Проводит конвертацию принятого от пользователя PDF-файла в excel-формат,
+таким образом мы получаем один из возможных вариантов распознаных данных.</p>
+</section>
+<section id="id3">
+<h2>Принцип работы модуля<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Открывает установленное приложение ABBYY FineReader по указанному пути до FineReader.exe файла</p></li>
+<li><p>Ждёт готовности загрузки главного окна приложения</p></li>
+<li><p>Нажимает на кнопку «Конвертировать в Microsoft Excel»</p></li>
+<li><p>Переключается на окно выброва файла для конвертации и указывает путь до PDF-файла</p></li>
+<li><p>Нажимает на кнопку запуска конвертации «Конвертировать в Excel»</p></li>
+<li><p>Вводит путь сохранения конечного excel-файла</p></li>
+<li><p>Снимает checkbox «Открыть документ после конвертации», если он был установлен</p></li>
+<li><p>Ожидает конвертации файла</p></li>
+<li><p>Закрывает приложение</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="id4">
+<h2>Конфигурация<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>Для работы модуля, необходимы следующие настройки:</dt><dd><ol class="arabic simple">
+<li><p>Путь, до запуска программы ABBYY FineReader -&gt; «FineReader.exe»</p></li>
+<li><p>Путь до PDF-файла, который необходимо распознать (первый аргумент функции)</p></li>
+<li><p>Путь до распознанного excel-файла, для его создания (второй аргумент функции)</p></li>
+</ol>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Зависимости<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<p>pywinauto 0.6.8, документация: <a class="reference external" href="https://pywinauto.readthedocs.io">https://pywinauto.readthedocs.io</a></p>
+</section>
+<section id="module-fine_reader_module.pywinauto_fr">
+<span id="id6"></span><h2>Функция модуля<a class="headerlink" href="#module-fine_reader_module.pywinauto_fr" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fine_reader_module.pywinauto_fr.recognition_using_fine_reader">
+<span class="sig-prename descclassname"><span class="pre">fine_reader_module.pywinauto_fr.</span></span><span class="sig-name descname"><span class="pre">recognition_using_fine_reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_to_the_recognition_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_to_save</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#fine_reader_module.pywinauto_fr.recognition_using_fine_reader" title="Link to this definition">¶</a></dt>
+<dd><p>Функция запуска UI работы с ABBYY FineReader
+Открывает десктопное приложение, по пути указанной в файле конфигурации проекта.
+Выбирает конвертацию в excel формат и сохраняет файл по указанному пути.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_to_the_recognition_file</strong> – Путь до PDF-файла, который необходимо ковертировать</p></li>
+<li><p><strong>path_to_save</strong> – Путь, конечного файла в формате xlsx</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Получение табличных данных из PDF</a></h1>
+
+
+
+
+
+
+
+
+<h3>Навигация</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Модуль работы с FineReader</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Расположение</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">Описание</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">Принцип работы модуля</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">Конфигурация</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">Зависимости</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-fine_reader_module.pywinauto_fr">Функция модуля</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="предыдущая глава">Welcome to Получение табличных данных из PDF’s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Быстрый поиск</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Искать" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Вадим Москаленко.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/fine_reader.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

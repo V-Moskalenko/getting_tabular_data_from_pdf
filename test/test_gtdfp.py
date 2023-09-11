@@ -3,12 +3,14 @@ import os
 import pandas
 from openpyxl import load_workbook
 
+from sources.fine_reader_module.pywinauto_fr import recognition_using_fine_reader
 from sources.settings import config_class
 from sources.recognition_module.pandas_work_with_file import delete_temp_files, get_width_column, resize_column, \
     write_finereader_data_to_excel, convert_data_list_in_excel, recognition_main
 
 config_class.poppler_config.poppler_path = os.path.abspath(r'..\utils\poppler-23.01.0\Library\bin')
 config_class.path_project.temp_dir = os.path.abspath(r'temp_test')
+
 
 # pytest -rA -v --tb=line test_gtdfp.py --cov-report term-missing --cov=sources
 
@@ -30,7 +32,7 @@ class TestWorkWithFile:
 
     def test_resize_column(self):
         df_dict = {'Column_1': ['more characters to test', 'test_2', 'test_3'],
-                   'Column_2': ['test_4', 'test_5', 'more characters to test']}
+                   'Column_2': ['test_4', 'test_5', 'test_test_test_test']}
         df_test = pandas.DataFrame(df_dict)
         test_path = r'temp_test\test_excel_resize.xlsx'
         df_test.to_excel(test_path)
@@ -50,14 +52,13 @@ class TestWorkWithFile:
         assert 'Данные FineReader' in [sheet for sheet in workbook.sheetnames]
 
     def test_convert_data_list_in_excel(self):
-        data_list = [['more characters to test', 'test_2', 'test_3'], ['test_4', 'test_5', 'more characters to test']]
+        data_list = [['test_1', 'test_2', 'test_3'], ['test_4', 'test_5', 'test_6']]
         test_path = r'temp_test\test_excel.xlsx'
         convert_data_list_in_excel(data_list, test_path)
         workbook = load_workbook(test_path)
         assert 'Данные Tesseract' in [sheet for sheet in workbook.sheetnames]
 
     def test_recognition_main(self):
-        print(config_class.poppler_config.poppler_path)
         test_path = os.path.abspath(r'temp_test\PDF-test.pdf')
         recognition_main(test_path, 0)
         result_path = r'temp_test\PDF-test.xlsx'
@@ -65,3 +66,12 @@ class TestWorkWithFile:
         sheet_tuple = ('Данные FineReader', 'Данные Tesseract')
         assert all([os.path.exists(result_path), all([i in [sh for sh in workbook.sheetnames] for i in sheet_tuple])])
         os.remove(result_path)
+
+
+class TestFineReader:
+    def test_recognition_using_fine_reader(self):
+        test_path = os.path.abspath(r'temp_test\PDF-test.pdf')
+        save_path = os.path.abspath(r'temp_test\PDF-test.xlsx')
+        recognition_using_fine_reader(test_path, save_path)
+        assert os.path.exists(save_path)
+        os.remove(save_path)

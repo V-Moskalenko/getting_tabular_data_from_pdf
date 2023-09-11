@@ -71,5 +71,3 @@ def setup_logger():
 
 config_class = ProjectConfig()
 setup_logger()
-# with open(r'../config/configuration.toml', 'w') as file:
-#     toml.dump(config_class.model_dump(), file)

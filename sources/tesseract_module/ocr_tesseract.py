@@ -17,6 +17,9 @@ logger = logging.getLogger(__name__)
 
 
 class RecognitionModule:
+    """
+    Класс распознавания табличных данных в PDF, с помощью Tesseract-OCR
+    """
     __slots__ = ('path_to_pdf', 'degree_of_rotation', 'data_from_pdf')
 
     def __init__(self, path_to_pdf: str, degree_of_rotation: int):

@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html lang="ru" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Модуль работы с Tesseract &#8212; документация Получение табличных данных из PDF 1.0.0</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=4f649999" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=039e1c02" />
+    <script src="_static/documentation_options.js?v=e35015f7"></script>
+    <script src="_static/doctools.js?v=888ff710"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/translations.js?v=29b1f277"></script>
+    <link rel="index" title="Алфавитный указатель" href="genindex.html" />
+    <link rel="search" title="Поиск" href="search.html" />
+    <link rel="prev" title="Модуль работы с FineReader" href="fine_reader.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="tesseract">
+<h1>Модуль работы с Tesseract<a class="headerlink" href="#tesseract" title="Link to this heading">¶</a></h1>
+<section id="id1">
+<h2>Расположение<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
+<p>sources -&gt; tesseract_module -&gt; ocr_tesseract.py</p>
+</section>
+<section id="id2">
+<h2>Описание<a class="headerlink" href="#id2" title="Link to this heading">¶</a></h2>
+<p>Модуль работы с Tesseract OCR.
+Конвектирует PDF-файл в изображение, на котором далее определяет позиции длинных горизонтальных
+и вертикальных линий, получает точки их пересечений и строит матрицу из координат ячеек таблицы,
+далее обрезает изображение по этим координатам и распознает текст с помощью Tesseract, добавляя
+полученные результаты в список, таким образом мы получаем один из возможных вариантов распознаных
+данных.</p>
+</section>
+<section id="id3">
+<h2>Принцип работы модуля<a class="headerlink" href="#id3" title="Link to this heading">¶</a></h2>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>Конвертирует каждую страницу PDF в отдельное PNG-изображение и поворачивает его на установленный наклон</p></li>
+<li><p>Подготавливает ихображение с помощью opencv-python</p></li>
+<li><p>Собирает матрицу координат ячеек таблицы</p></li>
+<li><p>Проходит циклом по собранной матрице, обрезает изображение по координатам и распознает текст</p></li>
+<li><p>Результаты распознанного текста добавляет в временный список по строкам</p></li>
+<li><p>Если Y-координата новой ячейки отличается от установленного значения, то началась новая строка таблицы,
+в таком случае, временный список добавляется в результирующий и затирается</p></li>
+<li><p>Полученный результат отфильтровывается от лишних символов/артефактов</p></li>
+<li><p>Результат добавляется в атрибут data_from_pdf</p></li>
+<li><p>В некоторых случаях OpenCV неработает с кириллицей, поэтому запускается функция временного переименования файла</p></li>
+</ol>
+</div></blockquote>
+</section>
+<section id="id4">
+<h2>Конфигурация<a class="headerlink" href="#id4" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt>Для работы модуля, необходимы следующие настройки:</dt><dd><ol class="arabic simple">
+<li><p>Путь, до запуска программы Tesseract-OCR -&gt; «tesseract.exe»</p></li>
+<li><p>Путь до Poppler, библиотеки конвектирующей pdf в изображение, находится в папке utils проекта</p></li>
+<li><p>Путь до PDF-файла, который необходимо распознать (первый аргумент функции)</p></li>
+<li><p>Наклон изображения, число символизирующее градусы (второй аргумент функции)</p></li>
+</ol>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Зависимости<a class="headerlink" href="#id5" title="Link to this heading">¶</a></h2>
+<p>pytesseract 0.3.10, репозиторий: <a class="reference external" href="https://github.com/madmaze/pytesseract">https://github.com/madmaze/pytesseract</a>
+opencv-python 4.8.0.76 репозиторий: <a class="reference external" href="https://github.com/opencv/opencv-python">https://github.com/opencv/opencv-python</a>
+pdf2image 1.16.3 документация: <a class="reference external" href="https://pdf2image.readthedocs.io">https://pdf2image.readthedocs.io</a></p>
+</section>
+<section id="module-sources.tesseract_module.ocr_tesseract">
+<span id="id6"></span><h2>Класс модуля<a class="headerlink" href="#module-sources.tesseract_module.ocr_tesseract" title="Link to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="sources.tesseract_module.ocr_tesseract.RecognitionModule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">sources.tesseract_module.ocr_tesseract.</span></span><span class="sig-name descname"><span class="pre">RecognitionModule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_to_pdf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">degree_of_rotation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#sources.tesseract_module.ocr_tesseract.RecognitionModule" title="Link to this definition">¶</a></dt>
+<dd><p>Класс распознавания табличных данных в PDF, с помощью Tesseract-OCR</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="sources.tesseract_module.ocr_tesseract.RecognitionModule.get_data_from_pdf">
+<span class="sig-name descname"><span class="pre">get_data_from_pdf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#sources.tesseract_module.ocr_tesseract.RecognitionModule.get_data_from_pdf" title="Link to this definition">¶</a></dt>
+<dd><p>Функция проходит по каждому листу PDF и поворачивает её на переданный наклон изображения</p>
+<dl class="field-list simple">
+<dt class="field-odd">Результат<span class="colon">:</span></dt>
+<dd class="field-odd"><p>На выходе получаем распознанную таблицу с данными</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sources.tesseract_module.ocr_tesseract.RecognitionModule.get_table">
+<span class="sig-name descname"><span class="pre">get_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#sources.tesseract_module.ocr_tesseract.RecognitionModule.get_table" title="Link to this definition">¶</a></dt>
+<dd><p>Получение табличных данных</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image</strong> – путь до изображения</p>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>таблица с распознынными данными</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sources.tesseract_module.ocr_tesseract.RecognitionModule.get_text_from_image">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_text_from_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coordinates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#sources.tesseract_module.ocr_tesseract.RecognitionModule.get_text_from_image" title="Link to this definition">¶</a></dt>
+<dd><p>Функция проходит по переданному списку координат, обрезает по ним изображение и проводит её распознавание.
+Распознанные части собираются построчно, взависимости от координыты Y, в итоговый список</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coordinates</strong> – список координат</p></li>
+<li><p><strong>image</strong> – подготовленный объект ихображения</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>список данных, распознанной таблицы</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sources.tesseract_module.ocr_tesseract.RecognitionModule.line_preparation">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">line_preparation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">recognized_table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#sources.tesseract_module.ocr_tesseract.RecognitionModule.line_preparation" title="Link to this definition">¶</a></dt>
+<dd><p>Очистка, фильтрация и формирование итоговой строки</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>recognized_table</strong> – очищенный список данных, распознанной таблицы</p>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sources.tesseract_module.ocr_tesseract.RecognitionModule.pdf_to_image">
+<span class="sig-name descname"><span class="pre">pdf_to_image</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span></span></span><a class="headerlink" href="#sources.tesseract_module.ocr_tesseract.RecognitionModule.pdf_to_image" title="Link to this definition">¶</a></dt>
+<dd><p>Конвектируем PDF в PNG рисунок и сохранем его в папку temp.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Результат<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Список путей до полученных рисунков</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sources.tesseract_module.ocr_tesseract.RecognitionModule.rename_pdf_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rename_pdf_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pdf_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#sources.tesseract_module.ocr_tesseract.RecognitionModule.rename_pdf_file" title="Link to this definition">¶</a></dt>
+<dd><p>Переименование PDF-файла из кириллицы</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>pdf_name</strong> – путь до PDF-файла</p>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>путь до переименованного файла</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="sources.tesseract_module.ocr_tesseract.RecognitionModule.rotate_image">
+<span class="sig-name descname"><span class="pre">rotate_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#sources.tesseract_module.ocr_tesseract.RecognitionModule.rotate_image" title="Link to this definition">¶</a></dt>
+<dd><p>Функция поворота изображения</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>image_path</strong> – путь до изображения</p>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>путь до изображения</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Получение табличных данных из PDF</a></h1>
+
+
+
+
+
+
+
+
+<h3>Навигация</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="fine_reader.html">Модуль работы с FineReader</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Модуль работы с Tesseract</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Расположение</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">Описание</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id3">Принцип работы модуля</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id4">Конфигурация</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id5">Зависимости</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-sources.tesseract_module.ocr_tesseract">Класс модуля</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="fine_reader.html" title="предыдущая глава">Модуль работы с FineReader</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Быстрый поиск</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Искать" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2023, Вадим Москаленко.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 7.2.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.13</a>
+      
+      |
+      <a href="_sources/tesseract.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
