@@ -1,12 +1,8 @@
 import logging
-from pathlib import Path
-
 from tendo import singleton
-
 from sources.telegram_bot import telebot_module
 
 logger = logging.getLogger(__name__)
-
 
 if __name__ == '__main__':
     try:

@@ -27,7 +27,7 @@ TEXT_R2 = "Перевёрнуто"
 TEXT_R3 = "Повернуто на 90 градусов вправо"
 TEXT_R4 = "Изображение не наклонено"
 
-bot = telebot.TeleBot('')#config_class.telebot_config.token)
+bot = telebot.TeleBot(config_class.telebot_config.token)
 
 
 @bot.message_handler(commands=['start'])
